@@ -3,9 +3,19 @@ var pug = require('pug');
 var keystone = require('keystone');
 
 function createTransporter() {
-    const transporterConfig = keystone.get('mail');
-    var transporter = nodemailer.createTransport(transporterConfig);
-    return transporter;
+    var err = 'Set right mail config in keystone.js';
+    var config = keystone.get('mail');
+
+    if (config) {
+        if (config.host && config.port && config.auth) {
+            var transporter = nodemailer.createTransport(config);
+            return transporter;
+        } else {
+            throw err;
+        }
+    } else {
+        throw err;
+    }
 }
 
 function isOptionsValid(options) {
@@ -24,17 +34,20 @@ function compileTemplate(templatePath, templateVars) {
 
 module.exports = function (options, callback) {
     if (isOptionsValid(options)) {
-        options.html = compileTemplate(options.template, options.templateVars);
-        var transporter = createTransporter();
+        try {
+            options.html = compileTemplate(options.template, options.templateVars);
+            var transporter = createTransporter();
 
-        transporter.sendMail(options, function (error, info) {
-            if (error) {
-                callback(error);
-            } else {
-                console.log('Message sent: %s', info.messageId);
-                callback(null);
-            }
-        });
+            transporter.sendMail(options, function (error, info) {
+                if (error) {
+                    callback(error);
+                } else {
+                    callback(null, info);
+                }
+            });
+        } catch (e) {
+            callback(e);
+        }
     } else {
         console.error(options);
         callback('Options is not valid');
