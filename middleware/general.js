@@ -1,5 +1,6 @@
 var keystone = require('keystone');
 var General = keystone.list('General');
+var logger = require('../utils/logger');
 
 module.exports = function (req, res, next) {
     var generalId = keystone.get('general');
@@ -15,7 +16,7 @@ module.exports = function (req, res, next) {
                 } else {
                     getFirstGeneral(function(err, general) {
                         if (err) {
-                            console.error(err);
+                            logger.error('middleware.general', err);
                         } else {
                             res.locals.general = general;
                         }
@@ -25,7 +26,7 @@ module.exports = function (req, res, next) {
     } else {
         getFirstGeneral(function(err, general) {
             if (err) {
-                console.error(err);
+                logger.error('middleware.general', err);
             } else {
                 res.locals.general = general;
             }
