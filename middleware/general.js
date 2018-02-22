@@ -17,8 +17,10 @@ module.exports = function (req, res, next) {
                     getFirstGeneral(function(err, general) {
                         if (err) {
                             logger.error('middleware.general', err);
+                            throw err;
                         } else {
                             res.locals.general = general;
+                            next();
                         }
                     });
                 }
@@ -27,8 +29,10 @@ module.exports = function (req, res, next) {
         getFirstGeneral(function(err, general) {
             if (err) {
                 logger.error('middleware.general', err);
+                throw err;
             } else {
                 res.locals.general = general;
+                next();
             }
         });
     }
