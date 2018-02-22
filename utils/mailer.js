@@ -1,6 +1,7 @@
 var nodemailer = require('nodemailer');
 var pug = require('pug');
 var keystone = require('keystone');
+var logger = require('./logger');
 
 function createTransporter() {
     var err = 'Set right mail config in keystone.js';
@@ -11,9 +12,11 @@ function createTransporter() {
             var transporter = nodemailer.createTransport(config);
             return transporter;
         } else {
+            logger.error('mailer:', err)
             throw err;
         }
     } else {
+        logger.error('mailer:', err);
         throw err;
     }
 }
@@ -40,16 +43,17 @@ module.exports = function (options, callback) {
 
             transporter.sendMail(options, function (error, info) {
                 if (error) {
+                    logger.error('mailer:', 'cannot send mail', error);
                     callback(error);
                 } else {
                     callback(null, info);
                 }
             });
-        } catch (e) {
-            callback(e);
+        } catch (err) {
+            callback(err);
         }
     } else {
-        console.error(options);
-        callback('Options is not valid');
+        logger.error('mailer:', 'options is not valid', options);
+        callback(options);
     }
 };
