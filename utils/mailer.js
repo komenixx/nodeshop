@@ -8,11 +8,11 @@ function createTransporter() {
     var config = keystone.get('mail');
 
     if (config) {
-        if (config.host && config.port && config.auth) {
+        if (config.host && config.port) {
             var transporter = nodemailer.createTransport(config);
             return transporter;
         } else {
-            logger.error('mailer:', err)
+            logger.error('mailer:', err);
             throw err;
         }
     } else {
